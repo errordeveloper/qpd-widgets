@@ -14,15 +14,15 @@ qpd_basic::qpd_basic(QWidget *parent)
 {
     //ui->setupUi(this);
 
-    pd_host_LineEdit = new QLineEdit("localhost");
+    pd_host = new QLineEdit("localhost");
 
-    pd_port_SpinBox = new QSpinBox(parent);
-    pd_port_SpinBox->setRange(1, 65535);
-    pd_port_SpinBox->setValue(2020);
-    //maybe TODO, split string: // pd_port_SpinBox->setPrefix(":");
+    pd_port= new QSpinBox(parent);
+    pd_port->setRange(1, 65535);
+    pd_port->setValue(2020);
+    //maybe TODO, split string: // pd_port->setPrefix(":");
 
         _put_col = new QLabel(tr(":"));
-        _put_col->setBuddy(pd_port_SpinBox);
+        _put_col->setBuddy(pd_port);
 
     connectButton = new QPushButton(tr("bang!"));
     connectButton->setDefault(true);
@@ -41,18 +41,18 @@ qpd_basic::qpd_basic(QWidget *parent)
     qpd_Sock = new QTcpSocket(this);
 
 
-connect(pd_host_LineEdit, SIGNAL(textChanged(const QString &)),
+connect(pd_host, SIGNAL(textChanged(const QString &)),
             this, SLOT(disableConnectButton()));
-connect(pd_port_SpinBox, SIGNAL(valueChanged(const QString &)), // mayb it should be 'const int &' ??
+connect(pd_port, SIGNAL(valueChanged(const QString &)), // mayb it should be 'const int &' ??
             this, SLOT(disableConnectButton()));
 connect(connectButton, SIGNAL(clicked()),
-            this, SLOT(qpd_tcp_sock()));
+            this, SLOT(qpd_socket()));
 
 connect(qpd_Sock, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
 connect(qpd_Sock, SIGNAL(connected()), this, SLOT(connectionControlsDisable()));
 
-connect(_connectionCheckBox, SIGNAL(clicked()), this, SLOT(qpd_tcp_c()));
+connect(_connectionCheckBox, SIGNAL(clicked()), this, SLOT(qpd_close()));
 
 connect(qpd_Sock, SIGNAL(connected()), this, SLOT(qpd_hello()));
 connect(qpd_Sock, SIGNAL(disconnected()), this, SLOT(connectionControlsEnable()));
@@ -60,9 +60,9 @@ connect(qpd_Sock, SIGNAL(disconnected()), this, SLOT(connectionControlsEnable())
 
         QGridLayout *mainLayout = new QGridLayout;
 
-    mainLayout->addWidget(pd_host_LineEdit, 0, 0);
+    mainLayout->addWidget(pd_host, 0, 0);
     mainLayout->addWidget(_put_col, 0, 1);
-    mainLayout->addWidget(pd_port_SpinBox, 0, 2);
+    mainLayout->addWidget(pd_port, 0, 2);
 
     mainLayout->addWidget(buttonBox, 0, 3);
     setLayout(mainLayout);
@@ -74,8 +74,8 @@ connect(qpd_Sock, SIGNAL(disconnected()), this, SLOT(connectionControlsEnable())
 
 void qpd_basic::disableConnectButton()
 {
-    connectButton->setEnabled(!pd_host_LineEdit->text().isEmpty()
-                                 && !pd_port_SpinBox->text().isEmpty());
+    connectButton->setEnabled(!pd_host->text().isEmpty()
+                                 && !pd_port->text().isEmpty());
     return;
 }
 
@@ -85,8 +85,8 @@ void qpd_basic::connectionControlsDisable()
     if(!_connectionCheckBox->isChecked())
         _connectionCheckBox->setChecked(true);
 
-    pd_host_LineEdit->setEnabled(false);
-    pd_port_SpinBox->setEnabled(false);
+    pd_host->setEnabled(false);
+    pd_port->setEnabled(false);
 
     connectButton->setText("bong.");
     connectButton->setEnabled(false);
@@ -102,8 +102,8 @@ void qpd_basic::connectionControlsEnable()
        _connectionCheckBox->setChecked(false);
        _connectionCheckBox->setEnabled(false);
 
-    pd_host_LineEdit->setEnabled(true);
-    pd_port_SpinBox->setEnabled(true);
+    pd_host->setEnabled(true);
+    pd_port->setEnabled(true);
 
     connectButton->setEnabled(true);
     connectButton->setText("bang!");
@@ -125,11 +125,11 @@ void qpd_basic::displayError(QAbstractSocket::SocketError _err_sock)
 
  }
 
-void qpd_basic::qpd_tcp_sock(void)
+void qpd_basic::qpd_socket(void)
 {
     connectButton->setEnabled(false);
-    qpd_Sock->connectToHost(pd_host_LineEdit->text(),
-                            pd_port_SpinBox->value());
+    qpd_Sock->connectToHost(pd_host->text(),
+                            pd_port->value());
 
     return;
 
@@ -156,7 +156,7 @@ void qpd_basic::qpd_hello()
 
 }
 
-void qpd_basic::qpd_tcp_w(QString _qpd_m)
+void qpd_basic::qpd_write(QString _qpd_m)
 {
 
    _qpd_m.append(";\n");
@@ -166,7 +166,7 @@ void qpd_basic::qpd_tcp_w(QString _qpd_m)
    return;
 }
 
-void qpd_basic::qpd_tcp_c()
+void qpd_basic::qpd_close()
 {
 
 #ifdef CLOSE

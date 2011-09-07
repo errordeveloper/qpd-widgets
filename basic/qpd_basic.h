@@ -35,30 +35,28 @@ public:
     ~qpd_basic();
 
 public slots:
-    void qpd_tcp_sock(); // init socket;
+    void qpd_socket(); // init socket;
     void qpd_hello(); // write msg;
-    void qpd_tcp_w(QString _qpd_m);
+    void qpd_write(QString _qpd_m);
 
 private slots:
     void displayError(QAbstractSocket::SocketError _err_sock);
     void disableConnectButton();
     void connectionControlsDisable();
     void connectionControlsEnable();
-    void qpd_tcp_c(); // close socket;
+    void qpd_close(); // close socket;
 
 private:
     // Ui::qpd_basic *ui;
 
-    QLineEdit *pd_host_LineEdit;    QLabel *_put_col;
-    QSpinBox *pd_port_SpinBox;      QCheckBox *_connectionCheckBox;
+    QLineEdit *pd_host;
+    QSpinBox *pd_port;
+    QLabel *_put_col;
+    QCheckBox *_connectionCheckBox;
     QPushButton *connectButton;
     QDialogButtonBox *buttonBox;
 
-    //QString connectButton_msg_1; // connection on
-    //QString connectButton_msg_0; // no connection
-
     QTcpSocket *qpd_Sock;
-    //QString *qpd_msg_s;
     quint16 blockSize;
 };
 
